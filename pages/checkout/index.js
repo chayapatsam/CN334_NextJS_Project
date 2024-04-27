@@ -13,13 +13,22 @@ export default function Checkout({ cartItems }) {
   };
 
   async function placeOrder() {
+    // ตรวจสอบว่ามีข้อมูล Full Name, Phone Number, และ Delivery Address ถูกกรอกครบหรือไม่
+    const fullNameInput = document.getElementById('fullName').value;
+    const phoneNumberInput = document.getElementById('phoneNumber').value;
+    const addressInput = document.getElementById('deliveryAddress').value;
+
+    if (!fullNameInput || !phoneNumberInput || !addressInput) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
     if (!paymentMethod || paymentMethod !== 'Cash on Delivery') {
       alert('Please select a payment method.');
       return;
     }
     
     try {
-      // ส่วนของโค้ดส่งคำสั่งไปยัง API นี่
       const response = await fetch('/api/placeOrder', {
         method: 'POST',
         headers: {
@@ -28,7 +37,10 @@ export default function Checkout({ cartItems }) {
         body: JSON.stringify({
           subTotal: calculateTotalPrice(cartItems).merchandiseSubtotal,
           shippingTotal: shippingTotal,
-          totalPayment: calculateTotalPrice(cartItems, shippingTotal).totalPayment
+          totalPayment: calculateTotalPrice(cartItems, shippingTotal).totalPayment,
+          fullName: fullNameInput,
+          phoneNumber: phoneNumberInput,
+          address: addressInput,
         })
       });
 
@@ -36,18 +48,21 @@ export default function Checkout({ cartItems }) {
         throw new Error('Failed to place order');
       }
 
-      // ลบข้อมูลใน collection carts
       await fetch('/api/resetCartItems', {
         method: 'DELETE'
       });
 
-      // เรียกใช้เมทอดการเปลี่ยนเส้นทาง
-      router.push('/')
+      // เมื่อสำเร็จในการสั่งซื้อ ทำการเปลี่ยนเส้นทางไปยังหน้า Home
+      router.push('/');
+
+      // แสดงการแจ้งเตือน
       alert('Order placed successfully!');
     } catch (error) {
       console.error('Error placing order:', error.message);
+      // ในกรณีเกิดข้อผิดพลาด แสดงการแจ้งเตือน
+      alert('Failed to place order. Please try again.');
     }
-  }
+  }  
 
   function calculateTotalPrice(cartItems, shippingTotal) {
     let merchandiseSubtotal = 0;
