@@ -1,12 +1,14 @@
 // pages/products/[id].js
+
 import { MongoClient } from 'mongodb';
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import QuantityButton from '@/components/QuantityButton';
 import AddToCartButton from '@/components/AddToCartButton';
+import { fetchTagSuggestions } from '@/utils/tagSuggestions'; // นำเข้าฟังก์ชัน fetchTagSuggestions
 
-export default function Product({ product }) {
+export default function Product({ product, tagSuggestions }) { // นำเข้า tagSuggestions มาจาก getServerSideProps
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
@@ -53,10 +55,18 @@ export default function Product({ product }) {
       </Head>
       <div className="text-center m-10">
         <img src={`/${product.id}.png`} alt={product.name} className="w-auto h-auto object-contain" />
-        <p className="mt-4">Description: {product.description}</p>
       </div>
       <div className="ml-8">
         <p className="text-xl font-semibold mb-2">Name: {product.name}</p>
+        <p className="max-w-[30rem] mb-2">{product.description}</p>
+        <div className="mb-2 flex flex-wrap items-center">
+          <p className="mr-1">Tag Suggestions:</p>
+          <ul className="flex flex-wrap gap-1">
+            {tagSuggestions.map((tag, index) => (
+              <li key={index} className="mr-1">{tag.tag}{index !== tagSuggestions.length - 1 && ','}</li>
+            ))}
+          </ul>
+        </div>
         <p className="text-xl font-semibold mb-2">Price: {product.price}</p>
         <QuantityButton
           quantity={quantity}
@@ -80,12 +90,16 @@ export async function getServerSideProps(context) {
   const productsCollection = db.collection('products');
   const product = await productsCollection.findOne({ id: id });
 
+  // Fetch tag suggestions
+  const tagSuggestions = await fetchTagSuggestions(product.description);
+
   // Close MongoDB connection
   client.close();
 
   return {
     props: {
-      product: JSON.parse(JSON.stringify(product))
+      product: JSON.parse(JSON.stringify(product)),
+      tagSuggestions: tagSuggestions
     }
   };
 }
