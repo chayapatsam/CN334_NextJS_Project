@@ -26,6 +26,11 @@ export default function Cart({ initialCartItems }) {
   };
 
   const handleDecrease = async (itemId) => {
+    const currentItem = cartItems.find(item => item._id === itemId);
+    if (currentItem.quantity <= 1) {
+      return; // ไม่ทำการลดค่า quantity ถ้า quantity มีค่าน้อยกว่าหรือเท่ากับ 1
+    }
+  
     const response = await fetch('/api/updateQuantity', {
       method: 'POST',
       headers: {
@@ -36,12 +41,12 @@ export default function Cart({ initialCartItems }) {
         action: 'decrease' // ระบุว่าเป็นการลดค่า quantity
       }),
     });
-
+  
     if (response.ok) {
       const updatedCartItems = await response.json();
       setCartItems(updatedCartItems);
     }
-  };
+  };  
 
   const handleDelete = async (itemId) => {
     const response = await fetch('/api/deleteCartItem', {

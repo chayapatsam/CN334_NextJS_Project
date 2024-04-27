@@ -11,6 +11,7 @@ import { fetchTagSuggestions } from '@/utils/tagSuggestions'; // นำเข้
 export default function Product({ product, tagSuggestions }) { // นำเข้า tagSuggestions มาจาก getServerSideProps
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
+  const [productAdded, setProductAdded] = useState(false);
 
   const increaseQuantity = () => {
     setQuantity(quantity + 1);
@@ -42,6 +43,7 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
 
     if (response.ok) {
       // router.push('/cart');
+      setProductAdded(true); // เปลี่ยนค่า productAdded เป็น true เมื่อสินค้าถูกเพิ่มลงในตะกร้า
     } else {
       console.error('Failed to add product to cart');
     }
@@ -74,6 +76,7 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
           decreaseQuantity={decreaseQuantity}
         />
         <AddToCartButton onClick={handleAddToCart} />
+        {productAdded && <p>Product has been added to your cart.</p>}
       </div>
     </div>
   );
