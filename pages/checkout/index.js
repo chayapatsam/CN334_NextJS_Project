@@ -1,12 +1,53 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { MongoClient } from 'mongodb';
 
 export default function Checkout({ cartItems }) {
   const [shippingTotal, setShippingTotal] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState(null);
+  const router = useRouter();
 
   const handleCashOnDelivery = () => {
     setShippingTotal(10);
+    setPaymentMethod('Cash on Delivery');
   };
+
+  async function placeOrder() {
+    if (!paymentMethod || paymentMethod !== 'Cash on Delivery') {
+      alert('Please select a payment method.');
+      return;
+    }
+    
+    try {
+      // ส่วนของโค้ดส่งคำสั่งไปยัง API นี่
+      const response = await fetch('/api/placeOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          subTotal: calculateTotalPrice(cartItems).merchandiseSubtotal,
+          shippingTotal: shippingTotal,
+          totalPayment: calculateTotalPrice(cartItems, shippingTotal).totalPayment
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to place order');
+      }
+
+      // ลบข้อมูลใน collection carts
+      await fetch('/api/resetCartItems', {
+        method: 'DELETE'
+      });
+
+      // เรียกใช้เมทอดการเปลี่ยนเส้นทาง
+      router.push('/')
+      alert('Order placed successfully!');
+    } catch (error) {
+      console.error('Error placing order:', error.message);
+    }
+  }
 
   function calculateTotalPrice(cartItems, shippingTotal) {
     let merchandiseSubtotal = 0;
@@ -15,7 +56,7 @@ export default function Checkout({ cartItems }) {
     });
 
     const totalPayment = merchandiseSubtotal + shippingTotal;
-    
+
     return {
       merchandiseSubtotal: merchandiseSubtotal,
       totalPayment: totalPayment
@@ -73,7 +114,7 @@ export default function Checkout({ cartItems }) {
           <p className="text-xl pt-4 pb-4">Shipping Total: ${shippingTotal}</p>
           <p className="text-xl pt-4 pb-4">Total Payment: ${calculateTotalPrice(cartItems, shippingTotal).totalPayment}</p>
 
-          <button className="bg-blue-500 text-white px-4 py-2 rounded">Place Order</button>
+          <button onClick={() => placeOrder()} className="bg-blue-500 text-white px-4 py-2 rounded">Place Order</button>
         </div>
       </div>
     </div>
