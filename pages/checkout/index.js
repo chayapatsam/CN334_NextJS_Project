@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { MongoClient } from 'mongodb';
+import Head from 'next/head';
 
 export default function Checkout({ cartItems }) {
   const [shippingTotal, setShippingTotal] = useState(0);
@@ -82,6 +83,10 @@ export default function Checkout({ cartItems }) {
 
   return (
     <div className="bg-gray-100">
+      <Head>
+        <title>Checkout | Leafy</title>
+        <meta name="description" content="Description of your dashboard page" />
+      </Head>
       <div className="max-w-3xl mx-auto px-4 py-8 flex">
         {/* Cart Items */}
         <div className="w-1/2 pr-4">

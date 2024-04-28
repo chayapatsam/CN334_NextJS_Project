@@ -72,30 +72,32 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
   }, [productQuantities, dailySales]);
 
   return (
-    <div>
-      <Head>
+    <div className="flex flex-col items-center justify-center">
+    <Head>
         <title>Dashboard | Leafy</title>
         <meta name="description" content="Description of your dashboard page" />
-      </Head>
-      <h1 className='text-center font-semibold text-3xl mt-8 mb-2'>Dashboard</h1>
-      <div className="flex items-center justify-center text-center">
-        <div className="bg-green-800 text-white p-5 rounded-lg m-5 w-1/5">
-          <h1>Total Orders: {totalOrders}</h1>
+    </Head>
+    <h1 className='text-center font-semibold text-3xl mt-8 mb-2'>Dashboard</h1>
+    <div className="grid grid-cols-2 gap-8">
+        <div className="bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
+        <h1>Total Orders: {totalOrders}</h1>
         </div>
-        <div className="bg-green-800 text-white p-5 rounded-lg m-5 w-1/5">
-          <h1>Total Payment: {totalPayment}</h1>
+        <div className="bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
+        <h1>Total Payment: {totalPayment}</h1>
         </div>
-      </div>
-      <div className="m-10 pl-10 w-[40%]">
-        <h2 className="text-xl font-semibold mb-4">Quantity of Sales</h2>
-        <canvas id="productChart"></canvas>
-      </div>
-      <div className="m-10 pl-10 w-[40%]">
-        <h2 className="text-xl font-semibold mb-4">Daily Sales</h2>
-        <canvas id="dailySalesChart"></canvas>
-      </div>
     </div>
-  );
+    <div className="flex items-center justify-center">
+        <div className="m-10">
+        <h2 className="text-xl font-semibold mb-4">Quantity of Sales</h2>
+        <canvas id="productChart" className="w-96 h-72"></canvas>
+        </div>
+        <div className="m-10">
+        <h2 className="text-xl font-semibold mb-4">Weekly Sales</h2>
+        <canvas id="dailySalesChart" className="w-96 h-72"></canvas>
+        </div>
+    </div>
+    </div>
+  );  
 }
 
 export async function getServerSideProps() {
@@ -116,9 +118,9 @@ export async function getServerSideProps() {
       {
         $sort: { _id: 1 } // Sort by date in ascending order
       },
-    //   {
-    //     $limit: 7 // Limit the result to 7 documents (7 days)
-    //   }
+      {
+        $limit: 7 // Limit the result to 7 documents (7 days)
+      }
     ]).toArray();
   
     client.close();

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { MongoClient } from 'mongodb';
 import QuantityButton2 from '@/components/QuantityButton2';
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default function Cart({ initialCartItems }) {
   const [cartItems, setCartItems] = useState(initialCartItems);
@@ -75,6 +76,10 @@ export default function Cart({ initialCartItems }) {
 
   return (
     <div className="bg-gray-100">
+      <Head>
+        <title>Cart | Leafy</title>
+        <meta name="description" content="Description of your dashboard page" />
+      </Head>
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row">
           {/* Shopping Cart */}
