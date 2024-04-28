@@ -8,6 +8,7 @@ export default function Checkout({ cartItems }) {
   const router = useRouter();
 
   const handleCashOnDelivery = () => {
+    event.preventDefault();
     setShippingTotal(10);
     setPaymentMethod('Cash on Delivery');
   };
@@ -81,60 +82,84 @@ export default function Checkout({ cartItems }) {
 
   return (
     <div className="bg-gray-100">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-semibold mb-4 border-b border-gray-800 pb-4 pt-4">Checkout</h1>
-        
+      <div className="max-w-3xl mx-auto px-4 py-8 flex">
         {/* Cart Items */}
-        <div className="space-y-4">
-          {cartItems.map((item) => (
-            <div key={item._id} className="border-b border-gray-800 pb-4 pt-4 flex items-center">
-              <img src={`/${item.id}.png`} alt={item.name} className="w-24 h-34 object-cover" />
-              <div className="ml-4 flex-grow">
-                <p className="text-xl font-semibold">{item.name}</p>
-                <p className="text-gray-600">${item.price}</p>
+        <div className="w-1/2 pr-4">
+          <h1 className="text-2xl font-semibold mb-4 border-b border-gray-800 pb-4 pt-4">Products Ordered</h1>
+          <div className="space-y-4">
+            {cartItems.map((item) => (
+              <div key={item._id} className="border-b border-gray-800 pb-4 flex items-center">
+                <img src={`/${item.id}.png`} alt={item.name} className="w-24 h-34 object-cover" />
+                <div className="ml-5 flex-grow">
+                  <p className="text-l font-semibold">{item.name}</p>
+                  <p className="text-gray-600">${item.price}</p>
+                </div>
+                <p className="ml-4 pr-2 pb-5">{item.quantity}</p>
+                <p className="ml-4 pb-5">${item.itemTotalPrice}</p>
               </div>
-              <p className="ml-4">{item.quantity}</p>
-              <p className="ml-4">${item.itemTotalPrice}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
         
-        {/* Delivery Address */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold border-b border-gray-800 pt-4 pb-4">Delivery Address</h2>
+        {/* Delivery Address and Payment Method */}
+        <div className="w-1/2 pl-10">
+          <h1 className="text-2xl font-semibold mb-4 border-b border-gray-800 pb-4 pt-4">Delivery Address</h1>
           <form>
             <div className="flex flex-col mb-4">
-              <label htmlFor="fullName" className="mb-2 font-semibold">Full Name</label>
+              <label htmlFor="fullName" className="mb-2">Full Name</label>
               <input type="text" id="fullName" name="fullName" className="border border-gray-300 px-4 py-2 rounded" />
             </div>
             <div className="flex flex-col mb-4">
-              <label htmlFor="phoneNumber" className="mb-2 font-semibold">Phone Number</label>
+              <label htmlFor="phoneNumber" className="mb-2">Phone Number</label>
               <input type="tel" id="phoneNumber" name="phoneNumber" className="border border-gray-300 px-4 py-2 rounded" />
             </div>
-            <div className="flex flex-col mb-4 border-b border-gray-800 pt-4 pb-4">
-              <label htmlFor="deliveryAddress" className="mb-2 font-semibold">Delivery Address</label>
+            <div className="flex flex-col mb-4 border-b border-gray-800 pb-4">
+              <label htmlFor="deliveryAddress" className="mb-2">Delivery Address</label>
               <textarea id="deliveryAddress" name="deliveryAddress" rows="4" className="border border-gray-300 px-4 py-2 rounded"></textarea>
             </div>
           </form>
-        </div>
-        
-        {/* Payment Method */}
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold">Payment Method</h2>
-          <button onClick={() => handleCashOnDelivery()} className="bg-green-500 text-white px-4 py-2 rounded mt-4">Cash on Delivery</button>
-        </div>
-        
-        {/* Merchandise Subtotal and Total Payment */}
-        <div className="border-t border-gray-800 mt-8 mb-4">
-          <p className="text-xl pt-4 pb-4">Merchandise Subtotal: ${calculateTotalPrice(cartItems).merchandiseSubtotal}</p>
-          <p className="text-xl pt-4 pb-4">Shipping Total: ${shippingTotal}</p>
-          <p className="text-xl pt-4 pb-4">Total Payment: ${calculateTotalPrice(cartItems, shippingTotal).totalPayment}</p>
+          
+          {/* Payment Method */}
+          <div className="mt-4">
+            <h2 className="text-2xl font-semibold">Payment Method</h2>
+            <button onClick={() => handleCashOnDelivery()} className="bg-green-500 text-white px-4 py-2 rounded mt-4">Cash on Delivery</button>
+          </div>
 
-          <button onClick={() => placeOrder()} className="bg-blue-500 text-white px-4 py-2 rounded">Place Order</button>
+          <div className="mt-4 border-t border-gray-800 pt-4 flex justify-between">
+            <div>
+              <p className="font-semibold">Merchandise Subtotal</p>
+            </div>
+            <div>
+              <p className="text-l">${calculateTotalPrice(cartItems).merchandiseSubtotal}</p>
+            </div>
+          </div>
+
+          <div className="pt-4 flex justify-between">
+            <div>
+              <p className="font-semibold">Shipping Total</p>
+            </div>
+            <div>
+              <p className="text-l">${shippingTotal}</p>
+            </div>
+          </div>
+
+          <div className="pt-4 flex justify-between">
+            <div>
+              <p className="font-semibold">Total Payment</p>
+            </div>
+            <div>
+              <p className="text-l">${calculateTotalPrice(cartItems, shippingTotal).totalPayment}</p>
+            </div>
+          </div>
+  
+          {/* Place Order Button */}
+          <div className="pt-4 pb-4">
+            <button onClick={() => placeOrder()} className="bg-blue-500 text-white px-4 py-2 rounded">Place Order</button>
+          </div>
         </div>
       </div>
     </div>
-  );
+  );  
 }
 
 export async function getServerSideProps() {

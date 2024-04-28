@@ -76,37 +76,50 @@ export default function Cart({ initialCartItems }) {
   return (
     <div className="bg-gray-100">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-semibold mb-4 border-b border-gray-800 pb-4 pt-4">Shopping Cart</h1>
-        <div className="space-y-4">
-          {cartItems.map((item) => (
-            <div key={item._id} className="border-b border-gray-800 pb-4 pt-4 flex items-center">
-              <img src={`/${item.id}.png`} alt={item.name} className="w-24 h-34 object-cover" />
-              <div className="ml-4 flex-grow">
-                <p className="text-xl font-semibold">{item.name}</p>
-                <p className="text-gray-600">${item.price}</p>
-              </div>
-              <div className="flex items-center">
-                <QuantityButton2
-                  quantity={item.quantity}
-                  onIncrease={() => handleIncrease(item._id)}
-                  onDecrease={() => handleDecrease(item._id)}
-                />
-                <p className="ml-4">${item.itemTotalPrice}</p>
-                <button onClick={() => handleDelete(item._id)} className="ml-4 bg-red-500 text-white px-4 py-2 rounded">Delete</button>
-              </div>
+        <div className="flex flex-col md:flex-row">
+          {/* Shopping Cart */}
+          <div className="md:flex-grow">
+            <h1 className="text-2xl font-semibold mb-4 border-b border-gray-800 pb-4 pt-4">Shopping Cart</h1>
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <div key={item._id} className="border-b border-gray-800 pb-4 flex items-center">
+                  <img src={`/${item.id}.png`} alt={item.name} className="w-24 h-34 object-cover" />
+                  <div className="ml-5 flex-grow">
+                    <p className="text-l font-semibold">{item.name}</p>
+                    <p className="text-gray-600">${item.price}</p>
+                  </div>
+                  <div className="flex items-center pb-5">
+                    <QuantityButton2
+                      quantity={item.quantity}
+                      onIncrease={() => handleIncrease(item._id)}
+                      onDecrease={() => handleDecrease(item._id)}
+                    />
+                    <p className="ml-8">${item.itemTotalPrice}</p>
+                    <button onClick={() => handleDelete(item._id)} className="ml-8 text-gray-500 pb-1">x</button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold border-b border-gray-800 pt-4 pb-4">Order Summary</h2>
-          <p className="text-xl pt-4 pb-4">Total Price: ${calculateTotalPrice()}</p>
-          <Link href="/checkout">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded">Checkout</button>
-          </Link>
+          </div>
+          {/* Order Summary */}
+          <div className="md:ml-10">
+            <h2 className="text-2xl font-semibold border-b border-gray-800 pt-4 pb-4">Order Summary</h2>
+            <div className="flex items-center pb-6">
+              <p className="text-sm pt-4 pb-4">Subtotal</p>
+              <p className="text-right flex-grow">${calculateTotalPrice()}</p>
+            </div>
+            <div className="flex items-center border-t border-gray-800 pt-4 pb-4">
+              <p className="text-l">Total</p>
+              <p className="text-right flex-grow">${calculateTotalPrice()}</p>
+            </div>
+            <Link href="/checkout">
+              <button className="bg-green-700 text-white px-20 py-1 rounded text-sm">Checkout</button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
-  );
+  );  
 }
 
 export async function getServerSideProps() {
