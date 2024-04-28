@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { subTotal, shippingTotal, totalPayment, fullName, phoneNumber, address } = req.body;
+    const { subTotal, shippingTotal, totalPayment, fullName, phoneNumber, address, cartItems } = req.body;
 
     try {
       // Connect to MongoDB
@@ -13,12 +13,13 @@ export default async function handler(req, res) {
       // Insert data into MongoDB
       const billsCollection = db.collection('bills');
       await billsCollection.insertOne({
-        subTotal,
-        shippingTotal,
-        totalPayment,
         fullName,
         phoneNumber,
         address,
+        cartItems,
+        subTotal,
+        shippingTotal,
+        totalPayment,
         createdAt: new Date()
       });
 

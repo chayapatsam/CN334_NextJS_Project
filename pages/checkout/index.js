@@ -17,12 +17,12 @@ export default function Checkout({ cartItems }) {
     const fullNameInput = document.getElementById('fullName').value;
     const phoneNumberInput = document.getElementById('phoneNumber').value;
     const addressInput = document.getElementById('deliveryAddress').value;
-
+  
     if (!fullNameInput || !phoneNumberInput || !addressInput) {
       alert('Please fill in all required fields.');
       return;
     }
-
+  
     if (!paymentMethod || paymentMethod !== 'Cash on Delivery') {
       alert('Please select a payment method.');
       return;
@@ -35,26 +35,27 @@ export default function Checkout({ cartItems }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          subTotal: calculateTotalPrice(cartItems).merchandiseSubtotal,
-          shippingTotal: shippingTotal,
-          totalPayment: calculateTotalPrice(cartItems, shippingTotal).totalPayment,
           fullName: fullNameInput,
           phoneNumber: phoneNumberInput,
           address: addressInput,
+          cartItems: cartItems.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity, itemTotalPrice: item.itemTotalPrice})),
+          subTotal: calculateTotalPrice(cartItems).merchandiseSubtotal,
+          shippingTotal: shippingTotal,
+          totalPayment: calculateTotalPrice(cartItems, shippingTotal).totalPayment,
         })
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to place order');
       }
-
+  
       await fetch('/api/resetCartItems', {
         method: 'DELETE'
       });
-
+  
       // เมื่อสำเร็จในการสั่งซื้อ ทำการเปลี่ยนเส้นทางไปยังหน้า Home
       router.push('/');
-
+  
       // แสดงการแจ้งเตือน
       alert('Order placed successfully!');
     } catch (error) {
@@ -62,7 +63,7 @@ export default function Checkout({ cartItems }) {
       // ในกรณีเกิดข้อผิดพลาด แสดงการแจ้งเตือน
       alert('Failed to place order. Please try again.');
     }
-  }  
+  }
 
   function calculateTotalPrice(cartItems, shippingTotal) {
     let merchandiseSubtotal = 0;
