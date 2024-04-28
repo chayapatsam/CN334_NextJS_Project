@@ -9,13 +9,22 @@ export default async function handler(req, res) {
       // Connect to MongoDB
       const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
       const db = client.db('leafy');
-
-      // Insert data into MongoDB
       const billsCollection = db.collection('bills');
 
-      // Calculate GMT+7 DateTime
       const currentDateTime = new Date();
-      const gmtPlus7DateTime = new Date(currentDateTime.getTime() + (7 * 60 * 60 * 1000));
+
+      // Extract date and time
+      const year = currentDateTime.getFullYear();
+      const month = currentDateTime.getMonth() + 1; // Months start from 0
+      const day = currentDateTime.getDate();
+      const hours = currentDateTime.getHours();
+      const minutes = currentDateTime.getMinutes();
+      const seconds = currentDateTime.getSeconds();
+      const milliseconds = currentDateTime.getMilliseconds();
+
+      // Format date and time
+      const dateOnly = `${year}-${(month < 10 ? '0' : '') + month}-${(day < 10 ? '0' : '') + day}`;
+      const timeOnly = `${(hours < 10 ? '0' : '') + hours}:${(minutes < 10 ? '0' : '') + minutes}:${(seconds < 10 ? '0' : '') + seconds}.${(milliseconds < 100 ? '0' : '') + milliseconds}`;
 
       await billsCollection.insertOne({
         fullName,
@@ -25,7 +34,10 @@ export default async function handler(req, res) {
         subTotal,
         shippingTotal,
         totalPayment,
-        createdAt: gmtPlus7DateTime // Set createdAt to GMT+7 DateTime
+        createdAt: {
+          date: dateOnly,
+          time: timeOnly
+        }
       });
 
       client.close();
