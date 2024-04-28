@@ -42,6 +42,7 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
     });
 
     if (response.ok) {
+      // window.alert('Product has been added to your cart.');
       // router.push('/cart');
       setProductAdded(true); // เปลี่ยนค่า productAdded เป็น true เมื่อสินค้าถูกเพิ่มลงในตะกร้า
     } else {
@@ -50,37 +51,44 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
   };
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="container mx-auto mt-8 mb-10">
       <Head>
-        <title>Products | Leafy</title>
+        <title>{product.name} | Leafy</title>
         <meta name="description" content={product.description} />
       </Head>
-      <div className="text-center m-10">
-        <img src={`/${product.id}.png`} alt={product.name} className="w-auto h-auto object-contain" />
-      </div>
-      <div className="ml-8">
-        <p className="text-xl font-semibold mb-2">Name: {product.name}</p>
-        <p className="max-w-[30rem] mb-2">{product.description}</p>
-        <div className="mb-2 flex flex-wrap items-center">
-          <p className="mr-1">Tag Suggestions:</p>
-          <ul className="flex flex-wrap gap-1">
-            {tagSuggestions.map((tag, index) => (
-              <li key={index} className="mr-1">{tag.tag}{index !== tagSuggestions.length - 1 && ','}</li>
-            ))}
-          </ul>
+      <div className="flex flex-col md:flex-row items-center justify-center md:space-x-10 p-10">
+        <div className="mb-6 md:mb-0">
+          <img src={`/${product.id}.png`} alt={product.name} className="object-contain h-85 w-full md:w-80" />
         </div>
-        <p className="text-xl font-semibold mb-2">Price: {product.price}</p>
-        <QuantityButton
-          quantity={quantity}
-          increaseQuantity={increaseQuantity}
-          decreaseQuantity={decreaseQuantity}
-        />
-        <AddToCartButton onClick={handleAddToCart} />
-        {productAdded && <p>Product has been added to your cart.</p>}
+        <div className="text-left">
+          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+          <p className="text-2xl mb-4">${product.price}</p>
+          <p className="text-gray-500 mb-4 max-w-[30rem]">{product.description}</p>
+          <div className="mb-2 flex flex-wrap items-center">
+            <p className="mr-1">Tag Suggestions:</p>
+            <ul className="flex flex-wrap gap-1">
+              {tagSuggestions.map((item, index) => (
+                <li key={index} className="mr-1">{item.tag}{index !== tagSuggestions.length - 1 ? ',' : ''}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="my-4">
+            <p className="text-md font-medium mb-2">Quantity</p>
+            <QuantityButton
+              quantity={quantity}
+              increaseQuantity={increaseQuantity}
+              decreaseQuantity={decreaseQuantity}
+            />
+          </div>
+          <AddToCartButton onClick={handleAddToCart} />
+          <div className="text-green-500 h-6 mt-1">
+            {productAdded && <p>Product has been added to your cart.</p>}
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+}  
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
