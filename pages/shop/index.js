@@ -10,8 +10,9 @@ const Shop = ({ products }) => {
       <Head>
         <title>Shop | Leafy</title>
       </Head>
-      <h1 className="text-3xl font-bold mb-8">สินค้าทั้งหมด</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <h1 className="text-3xl font-bold mt-8 mb-10 text-center">Plant</h1> 
+    <div className ="block-shop">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => (
           <ItemBox
             key={product._id}
@@ -21,6 +22,7 @@ const Shop = ({ products }) => {
             price={product.price}
           />
         ))}
+      </div>
       </div>
     </>
   );
