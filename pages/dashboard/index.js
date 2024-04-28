@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { MongoClient } from 'mongodb';
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
+import Image from 'next/image';
 
 export default function Dashboard({ productQuantities, totalOrders, totalPayment, dailySales }) {
   const productChartRef = useRef(null);
@@ -79,11 +80,13 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
     </Head>
     <h1 className='text-center font-semibold text-3xl mt-8 mb-2'>Dashboard</h1>
     <div className="grid grid-cols-2 gap-8">
-        <div className="bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
-        <h1>Total Orders: {totalOrders}</h1>
+        <div className="space-x-3 bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
+          <Image src="/order.png" width={30} height={30} alt="order"/>
+          <h1>Total Orders: {totalOrders}</h1>
         </div>
-        <div className="bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
-        <h1>Total Payment: {totalPayment}</h1>
+        <div className="space-x-3 bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
+          <Image src="/money.png" width={30} height={30} alt="money"/>
+          <h1>Total sales: {totalPayment}</h1>
         </div>
     </div>
     <div className="flex items-center justify-center">
