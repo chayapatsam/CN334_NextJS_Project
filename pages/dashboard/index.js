@@ -1,8 +1,76 @@
 // pages/dashboard.js
 import Head from 'next/head';
 import { MongoClient } from 'mongodb';
+import { useEffect, useRef } from 'react';
+import Chart from 'chart.js/auto';
 
-export default function Dashboard({ productQuantities, totalOrders, totalPayment }) {
+export default function Dashboard({ productQuantities, totalOrders, totalPayment, dailySales }) {
+  const productChartRef = useRef(null);
+  const dailySalesChartRef = useRef(null);
+
+  useEffect(() => {
+    if (productChartRef.current !== null) {
+      productChartRef.current.destroy();
+    }
+
+    const productCtx = document.getElementById('productChart').getContext('2d');
+    productChartRef.current = new Chart(productCtx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(productQuantities),
+        datasets: [{
+          label: 'Product Quantities',
+          data: Object.values(productQuantities),
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    if (dailySalesChartRef.current !== null) {
+      dailySalesChartRef.current.destroy();
+    }
+
+    const dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
+    dailySalesChartRef.current = new Chart(dailySalesCtx, {
+      type: 'line',
+      data: {
+        labels: dailySales.map(sale => sale._id), // Dates
+        datasets: [{
+          label: 'Daily Sales',
+          data: dailySales.map(sale => sale.totalSales), // Total sales for each date
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    return () => {
+      if (productChartRef.current !== null) {
+        productChartRef.current.destroy();
+      }
+      if (dailySalesChartRef.current !== null) {
+        dailySalesChartRef.current.destroy();
+      }
+    };
+  }, [productQuantities, dailySales]);
+
   return (
     <div>
       <Head>
@@ -18,58 +86,81 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
           <h1>Total Payment: {totalPayment}</h1>
         </div>
       </div>
-      <div className="flex flex-wrap justify-center">
-        {Object.keys(productQuantities).map((productName, index) => (
-          <div key={index} className="bg-blue-800 text-white p-5 rounded-lg m-5 w-1/5">
-            <h1>{productName}: {productQuantities[productName]}</h1>
-          </div>
-        ))}
+      <div className="m-10 pl-10 w-[40%]">
+        <h2 className="text-xl font-semibold mb-4">Quantity of Sales</h2>
+        <canvas id="productChart"></canvas>
+      </div>
+      <div className="m-10 pl-10 w-[40%]">
+        <h2 className="text-xl font-semibold mb-4">Daily Sales</h2>
+        <canvas id="dailySalesChart"></canvas>
       </div>
     </div>
   );
 }
 
 export async function getServerSideProps() {
+  // Function to calculate daily sales
+  async function calculateDailySales() {
+    const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
+    const db = client.db('leafy');
+    const billsCollection = db.collection('bills');
+  
+    // Aggregate to group totalPayment by date and sum it up
+    const dailySalesResult = await billsCollection.aggregate([
+      {
+        $group: {
+          _id: '$createdAt.date', // Group by date
+          totalSales: { $sum: '$totalPayment' } // Sum up totalPayment for each date
+        }
+      },
+      {
+        $sort: { _id: 1 } // Sort by date in ascending order
+      },
+    //   {
+    //     $limit: 7 // Limit the result to 7 documents (7 days)
+    //   }
+    ]).toArray();
+  
+    client.close();
+  
+    return dailySalesResult;
+  }  
+
+  // Calculate daily sales
+  const dailySales = await calculateDailySales();
+
+  // Fetch other data for the dashboard
   const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
   const db = client.db('leafy');
-
   const billsCollection = db.collection('bills');
   const productsCollection = db.collection('products');
 
-  // ใช้ aggregation framework เพื่อหาข้อมูล quantity ทั้งหมดของแต่ละสินค้าแยกตามชื่อของสินค้า
   const productQuantityResult = await billsCollection.aggregate([
     {
-      $unwind: "$cartItems"
+      $unwind: '$cartItems'
     },
     {
       $group: {
-        _id: "$cartItems.name",
-        totalQuantity: { $sum: "$cartItems.quantity" }
+        _id: '$cartItems.name',
+        totalQuantity: { $sum: '$cartItems.quantity' }
       }
     }
   ]).toArray();
 
-  // ดึงข้อมูลสินค้าทั้งหมดจาก collection products
   const products = await productsCollection.find({}).toArray();
-
-  // สร้าง object เพื่อเก็บข้อมูล quantity ของแต่ละสินค้า และกำหนดค่าเริ่มต้นเป็น 0
   const productQuantities = {};
   products.forEach(product => {
     productQuantities[product.name] = 0;
   });
-
-  // นับสินค้าที่ถูกซื้อมา
   productQuantityResult.forEach(item => {
     productQuantities[item._id] = item.totalQuantity;
   });
 
-  // ถ้ามีผลรวมของ totalPayment จะเป็น array ที่มีขนาดเท่ากับ 1
-  // ฉะนั้นเราต้องตรวจสอบว่ามีข้อมูลหรือไม่ก่อนที่จะดึงค่า totalPayment ออกมา
   const totalPaymentResult = await billsCollection.aggregate([
     {
       $group: {
         _id: null,
-        totalPayment: { $sum: "$totalPayment" }
+        totalPayment: { $sum: '$totalPayment' }
       }
     }
   ]).toArray();
@@ -83,7 +174,8 @@ export async function getServerSideProps() {
     props: {
       productQuantities: productQuantities,
       totalOrders: totalOrders,
-      totalPayment: totalPayment
+      totalPayment: totalPayment,
+      dailySales: dailySales
     },
   };
 }
