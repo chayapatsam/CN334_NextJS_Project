@@ -12,6 +12,11 @@ export default async function handler(req, res) {
 
       // Insert data into MongoDB
       const billsCollection = db.collection('bills');
+
+      // Calculate GMT+7 DateTime
+      const currentDateTime = new Date();
+      const gmtPlus7DateTime = new Date(currentDateTime.getTime() + (7 * 60 * 60 * 1000));
+
       await billsCollection.insertOne({
         fullName,
         phoneNumber,
@@ -20,7 +25,7 @@ export default async function handler(req, res) {
         subTotal,
         shippingTotal,
         totalPayment,
-        createdAt: new Date()
+        createdAt: gmtPlus7DateTime // Set createdAt to GMT+7 DateTime
       });
 
       client.close();
