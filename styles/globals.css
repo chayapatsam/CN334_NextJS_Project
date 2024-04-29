@@ -14,3 +14,12 @@
 body{
     background-color: #F6F6F6;
 }
+
+html, body {
+  font-family: 'Inter', sans-serif;
+
+}
+
+input, textarea, button {
+  font-family: 'Inter', sans-serif;
+}
