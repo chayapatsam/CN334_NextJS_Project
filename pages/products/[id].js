@@ -63,7 +63,8 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
         <div className="text-left">
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
           <p className="text-2xl mb-4">${product.price}</p>
-          <p className="text-gray-500 mb-4 max-w-[30rem]">{product.description}</p>
+          {/* <p className="text-gray-500 mb-4 max-w-[30rem]" dangerouslySetInnerHTML={{ __html: product.description }} /> */}
+          <p className="text-gray-500 mb-4 max-w-[30rem]" style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
           <div className="mb-2 flex flex-wrap items-center">
             <p className="mr-1">Tag Suggestions:</p>
             <ul className="flex flex-wrap gap-1">
