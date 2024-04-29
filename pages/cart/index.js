@@ -71,7 +71,7 @@ export default function Cart({ initialCartItems }) {
     cartItems.forEach(item => {
       total += item.price * item.quantity;
     });
-    return total;
+    return total.toFixed(2);
   };
 
   return (
@@ -99,7 +99,7 @@ export default function Cart({ initialCartItems }) {
                       onIncrease={() => handleIncrease(item._id)}
                       onDecrease={() => handleDecrease(item._id)}
                     />
-                    <p className="ml-8">${item.itemTotalPrice}</p>
+                    <p className="ml-8">${item.itemTotalPrice.toFixed(2)}</p>
                     <button onClick={() => handleDelete(item._id)} className="ml-8 text-gray-500 pb-1">x</button>
                   </div>
                 </div>

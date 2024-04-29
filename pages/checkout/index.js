@@ -76,8 +76,8 @@ export default function Checkout({ cartItems }) {
     const totalPayment = merchandiseSubtotal + shippingTotal;
 
     return {
-      merchandiseSubtotal: merchandiseSubtotal,
-      totalPayment: totalPayment
+      merchandiseSubtotal: merchandiseSubtotal.toFixed(2),
+      totalPayment: totalPayment.toFixed(2)
     };
   }
 

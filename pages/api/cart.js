@@ -7,7 +7,7 @@ export default async function handler(req, res) {
       const { id, name, price, quantity } = req.body;
 
       // Calculate itemTotalPrice
-      const itemTotalPrice = price * quantity;
+      const itemTotalPrice = parseFloat((price * quantity).toFixed(2));
 
       // Connect to MongoDB
       const db = await connectToDatabase();
