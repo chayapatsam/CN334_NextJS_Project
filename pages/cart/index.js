@@ -118,7 +118,7 @@ export default function Cart({ initialCartItems }) {
               <p className="text-right flex-grow">${calculateTotalPrice()}</p>
             </div>
             <Link href="/checkout">
-              <button className="bg-green-700 text-white px-20 py-1 rounded text-sm">Checkout</button>
+              <button className="bg-[#2E5F2A] text-white px-20 py-1 rounded ">Checkout</button>
             </Link>
           </div>
         </div>

@@ -80,11 +80,11 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
     </Head>
     <h1 className='text-center font-semibold text-3xl mt-8 mb-2'>Dashboard</h1>
     <div className="grid grid-cols-2 gap-8">
-        <div className="space-x-3 bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
+        <div className="space-x-3 bg-[#2E5F2A] text-white p-5 rounded-lg mt-5 flex items-center justify-center">
           <Image src="/order.png" width={30} height={30} alt="order"/>
           <h1>Total Orders: {totalOrders}</h1>
         </div>
-        <div className="space-x-3 bg-green-800 text-white p-5 rounded-lg mt-5 flex items-center justify-center">
+        <div className="space-x-3 bg-[#2E5F2A] text-white p-5 rounded-lg mt-5 flex items-center justify-center">
           <Image src="/money.png" width={30} height={30} alt="money"/>
           <h1>Total sales: {totalPayment}</h1>
         </div>
