@@ -86,7 +86,7 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
         </div>
         <div className="space-x-3 bg-[#2E5F2A] text-white p-5 rounded-lg mt-5 flex items-center justify-center">
           <Image src="/money.png" width={30} height={30} alt="money"/>
-          <h1>Total sales: {totalPayment}</h1>
+          <h1>Total sales: {totalPayment.toFixed(2)}</h1>
         </div>
     </div>
     <div className="flex items-center justify-center">
