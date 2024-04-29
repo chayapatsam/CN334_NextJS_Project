@@ -15,7 +15,6 @@ export default function Checkout({ cartItems }) {
   };
 
   async function placeOrder() {
-    // ตรวจสอบว่ามีข้อมูล Full Name, Phone Number, และ Delivery Address ถูกกรอกครบหรือไม่
     const fullNameInput = document.getElementById('fullName').value;
     const phoneNumberInput = document.getElementById('phoneNumber').value;
     const addressInput = document.getElementById('deliveryAddress').value;
@@ -55,14 +54,11 @@ export default function Checkout({ cartItems }) {
         method: 'DELETE'
       });
   
-      // เมื่อสำเร็จในการสั่งซื้อ ทำการเปลี่ยนเส้นทางไปยังหน้า Home
       router.push('/');
   
-      // แสดงการแจ้งเตือน
       alert('Order placed successfully!');
     } catch (error) {
       console.error('Error placing order:', error.message);
-      // ในกรณีเกิดข้อผิดพลาด แสดงการแจ้งเตือน
       alert('Failed to place order. Please try again.');
     }
   }

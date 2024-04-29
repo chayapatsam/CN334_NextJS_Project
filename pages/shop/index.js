@@ -1,5 +1,3 @@
-// pages/shop.js
-
 import Head from "next/head";
 import { MongoClient } from "mongodb";
 import ItemBox from "@/components/ItemBox";
@@ -29,15 +27,13 @@ const Shop = ({ products }) => {
 };
 
 export async function getServerSideProps() {
-  // Connect to MongoDB
   const client = await MongoClient.connect(process.env.MONGODB_URI);
   const db = client.db("leafy");
 
-  // Fetch products from carts collection
   const cartsCollection = db.collection("products");
   const products = await cartsCollection.find({}).toArray();
 
-  client.close();
+  client.close();อ
 
   return {
     props: {

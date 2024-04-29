@@ -6,24 +6,18 @@ export default async function handler(req, res) {
     try {
       const { id, name, price, quantity } = req.body;
 
-      // Calculate itemTotalPrice
       const itemTotalPrice = parseFloat((price * quantity).toFixed(2));
 
-      // Connect to MongoDB
       const db = await connectToDatabase();
-
-      // Access the collection
       const collection = db.collection('carts');
 
       // Check if the product already exists in the cart
       const existingProduct = await collection.findOne({ id });
 
       if (existingProduct) {
-        // If the product exists, update the quantity and itemTotalPrice
         const updatedQuantity = existingProduct.quantity + quantity;
         const updatedItemTotalPrice = existingProduct.itemTotalPrice + itemTotalPrice;
 
-        // Update the quantity and itemTotalPrice of the existing product in the cart
         await collection.updateOne(
           { id },
           { $set: { quantity: updatedQuantity, itemTotalPrice: updatedItemTotalPrice } }
@@ -31,13 +25,12 @@ export default async function handler(req, res) {
 
         res.status(200).json({ message: 'Product quantity updated in cart successfully' });
       } else {
-        // If the product doesn't exist in the cart, insert a new document
         await collection.insertOne({
           id,
           name,
           price,
           quantity,
-          itemTotalPrice  // Add itemTotalPrice to the document
+          itemTotalPrice
         });
 
         res.status(201).json({ message: 'Product added to cart successfully' });

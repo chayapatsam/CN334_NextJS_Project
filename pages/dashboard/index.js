@@ -1,4 +1,3 @@
-// pages/dashboard.js
 import Head from 'next/head';
 import { MongoClient } from 'mongodb';
 import { useEffect, useRef } from 'react';
@@ -44,10 +43,10 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
     dailySalesChartRef.current = new Chart(dailySalesCtx, {
       type: 'line',
       data: {
-        labels: dailySales.map(sale => sale._id), // Dates
+        labels: dailySales.map(sale => sale._id),
         datasets: [{
           label: 'Daily Sales',
-          data: dailySales.map(sale => sale.totalSales), // Total sales for each date
+          data: dailySales.map(sale => sale.totalSales),
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           borderColor: 'rgba(255, 99, 132, 1)',
           borderWidth: 1
@@ -104,39 +103,33 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
 }
 
 export async function getServerSideProps() {
-  // Connect to MongoDB
   const client = await MongoClient.connect(process.env.MONGODB_URI);
   const db = client.db('leafy');
   const billsCollection = db.collection('bills');
   const productsCollection = db.collection('products');
 
-  // Function to calculate daily sales
   async function calculateDailySales() {
-    // Aggregate to group totalPayment by date and sum it up
     const dailySalesResult = await billsCollection.aggregate([
       {
         $group: {
-          _id: '$createdAt.date', // Group by date
-          totalSales: { $sum: '$totalPayment' } // Sum up totalPayment for each date
+          _id: '$createdAt.date',
+          totalSales: { $sum: '$totalPayment' }
         }
       },
       {
-        $sort: { _id: -1 } // Sort by date in descending order
+        $sort: { _id: -1 }
       },
       {
-        $limit: 7 // Limit the result to the latest 7 documents (7 days)
+        $limit: 7
       }
     ]).toArray();
 
-    // Reverse the array to display the latest data first
     dailySalesResult.reverse();
 
     return dailySalesResult;
   }
 
-  // Fetch other data for the dashboard
   const [productQuantityResult, products, totalPaymentResult] = await Promise.all([
-    // Calculate product quantities
     billsCollection.aggregate([
       {
         $unwind: '$cartItems'
@@ -148,9 +141,9 @@ export async function getServerSideProps() {
         }
       }
     ]).toArray(),
-    // Fetch products
+
     productsCollection.find({}).toArray(),
-    // Calculate total payment
+
     billsCollection.aggregate([
       {
         $group: {
@@ -161,10 +154,8 @@ export async function getServerSideProps() {
     ]).toArray()
   ]);
 
-  // Calculate daily sales
   const dailySales = await calculateDailySales();
 
-  // Process product quantities
   const productQuantities = {};
   products.forEach(product => {
     productQuantities[product.name] = 0;
@@ -173,13 +164,10 @@ export async function getServerSideProps() {
     productQuantities[item._id] = item.totalQuantity;
   });
 
-  // Extract total payment
   const totalPayment = totalPaymentResult.length > 0 ? totalPaymentResult[0].totalPayment : 0;
 
-  // Count total orders
   const totalOrders = await billsCollection.countDocuments();
 
-  // Close MongoDB connection
   client.close();
 
   return {

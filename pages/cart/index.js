@@ -16,7 +16,7 @@ export default function Cart({ initialCartItems }) {
       },
       body: JSON.stringify({
         itemId: itemId,
-        action: 'increase' // ระบุว่าเป็นการเพิ่มค่า quantity
+        action: 'increase'
       }),
     });
 
@@ -29,7 +29,7 @@ export default function Cart({ initialCartItems }) {
   const handleDecrease = async (itemId) => {
     const currentItem = cartItems.find(item => item._id === itemId);
     if (currentItem.quantity <= 1) {
-      return; // ไม่ทำการลดค่า quantity ถ้า quantity มีค่าน้อยกว่าหรือเท่ากับ 1
+      return;
     }
   
     const response = await fetch('/api/updateQuantity', {
@@ -39,7 +39,7 @@ export default function Cart({ initialCartItems }) {
       },
       body: JSON.stringify({
         itemId: itemId,
-        action: 'decrease' // ระบุว่าเป็นการลดค่า quantity
+        action: 'decrease'
       }),
     });
   
@@ -128,15 +128,12 @@ export default function Cart({ initialCartItems }) {
 }
 
 export async function getServerSideProps() {
-  // Connect to MongoDB
   const client = await MongoClient.connect(process.env.MONGODB_URI);
   const db = client.db('leafy');
 
-  // Get data from MongoDB
   const cartsCollection = db.collection('carts');
   const cartItems = await cartsCollection.find({}).toArray();
 
-  // Close MongoDB connection
   client.close();
 
   return {

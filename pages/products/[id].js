@@ -1,14 +1,12 @@
-// pages/products/[id].js
-
 import { MongoClient } from 'mongodb';
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import QuantityButton from '@/components/QuantityButton';
 import AddToCartButton from '@/components/AddToCartButton';
-import { fetchTagSuggestions } from '@/utils/tagSuggestions'; // นำเข้าฟังก์ชัน fetchTagSuggestions
+import { fetchTagSuggestions } from '@/utils/tagSuggestions';
 
-export default function Product({ product, tagSuggestions }) { // นำเข้า tagSuggestions มาจาก getServerSideProps
+export default function Product({ product, tagSuggestions }) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const [productAdded, setProductAdded] = useState(false);
@@ -42,9 +40,7 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
     });
 
     if (response.ok) {
-      // window.alert('Product has been added to your cart.');
-      // router.push('/cart');
-      setProductAdded(true); // เปลี่ยนค่า productAdded เป็น true เมื่อสินค้าถูกเพิ่มลงในตะกร้า
+      setProductAdded(true);
     } else {
       console.error('Failed to add product to cart');
     }
@@ -63,7 +59,6 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
         <div className="text-left">
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
           <p className="text-2xl mb-4">${product.price}</p>
-          {/* <p className="text-gray-500 mb-4 max-w-[30rem]" dangerouslySetInnerHTML={{ __html: product.description }} /> */}
           <p className="text-gray-500 mb-4 max-w-[30rem]" style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
           <div className="mb-2 flex flex-wrap items-center">
             <p className="mr-1">Tag Suggestions:</p>
@@ -94,18 +89,15 @@ export default function Product({ product, tagSuggestions }) { // นำเข�
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
-  // Connect to MongoDB
   const client = await MongoClient.connect(process.env.MONGODB_URI);
   const db = client.db('leafy');
 
-  // Get data from MongoDB
+
   const productsCollection = db.collection('products');
   const product = await productsCollection.findOne({ id: id });
 
-  // Fetch tag suggestions
   const tagSuggestions = await fetchTagSuggestions(product.description);
 
-  // Close MongoDB connection
   client.close();
 
   return {

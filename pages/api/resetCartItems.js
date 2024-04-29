@@ -1,12 +1,10 @@
-// api/resetCartItems.js
 import { MongoClient } from 'mongodb';
 
-// Connect to MongoDB
 let client = null;
 
 async function connectToDatabase() {
   if (!client) {
-    client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
+    client = await MongoClient.connect(process.env.MONGODB_URI);
   }
   return client.db('leafy');
 }

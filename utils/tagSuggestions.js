@@ -1,5 +1,3 @@
-// utils/tagSuggestions.js
-
 export async function fetchTagSuggestions(description) {
   const url = "https://api.aiforthai.in.th/tagsuggestion";
   const apiKey = "FlQmWVQAWMcJGLiCTQ6mDzBvkJkpl4vY";
