@@ -1,4 +1,4 @@
-// cart.js
+//api/cart.js
 import { connectToDatabase } from '@/utils/mongodb';
 
 export default async function handler(req, res) {

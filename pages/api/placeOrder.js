@@ -26,14 +26,19 @@ export default async function handler(req, res) {
       const dateOnly = `${year}-${(month < 10 ? '0' : '') + month}-${(day < 10 ? '0' : '') + day}`;
       const timeOnly = `${(hours < 10 ? '0' : '') + hours}:${(minutes < 10 ? '0' : '') + minutes}:${(seconds < 10 ? '0' : '') + seconds}.${(milliseconds < 100 ? '0' : '') + milliseconds}`;
 
+      // แปลง subTotal, shippingTotal, และ totalPayment เป็น double
+      const parsedSubTotal = parseFloat(subTotal);
+      const parsedShippingTotal = parseFloat(shippingTotal);
+      const parsedTotalPayment = parseFloat(totalPayment);
+
       await billsCollection.insertOne({
         fullName,
         phoneNumber,
         address,
         cartItems,
-        subTotal,
-        shippingTotal,
-        totalPayment,
+        subTotal: parsedSubTotal,
+        shippingTotal: parsedShippingTotal,
+        totalPayment: parsedTotalPayment,
         createdAt: {
           date: dateOnly,
           time: timeOnly
