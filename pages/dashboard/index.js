@@ -104,12 +104,14 @@ export default function Dashboard({ productQuantities, totalOrders, totalPayment
 }
 
 export async function getServerSideProps() {
+  // Connect to MongoDB
+  const client = await MongoClient.connect(process.env.MONGODB_URI);
+  const db = client.db('leafy');
+  const billsCollection = db.collection('bills');
+  const productsCollection = db.collection('products');
+
   // Function to calculate daily sales
   async function calculateDailySales() {
-    const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
-    const db = client.db('leafy');
-    const billsCollection = db.collection('bills');
-  
     // Aggregate to group totalPayment by date and sum it up
     const dailySalesResult = await billsCollection.aggregate([
       {
@@ -125,34 +127,41 @@ export async function getServerSideProps() {
         $limit: 7 // Limit the result to 7 documents (7 days)
       }
     ]).toArray();
-  
-    client.close();
-  
+
     return dailySalesResult;
   }  
+
+  // Fetch other data for the dashboard
+  const [productQuantityResult, products, totalPaymentResult] = await Promise.all([
+    // Calculate product quantities
+    billsCollection.aggregate([
+      {
+        $unwind: '$cartItems'
+      },
+      {
+        $group: {
+          _id: '$cartItems.name',
+          totalQuantity: { $sum: '$cartItems.quantity' }
+        }
+      }
+    ]).toArray(),
+    // Fetch products
+    productsCollection.find({}).toArray(),
+    // Calculate total payment
+    billsCollection.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalPayment: { $sum: '$totalPayment' }
+        }
+      }
+    ]).toArray()
+  ]);
 
   // Calculate daily sales
   const dailySales = await calculateDailySales();
 
-  // Fetch other data for the dashboard
-  const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
-  const db = client.db('leafy');
-  const billsCollection = db.collection('bills');
-  const productsCollection = db.collection('products');
-
-  const productQuantityResult = await billsCollection.aggregate([
-    {
-      $unwind: '$cartItems'
-    },
-    {
-      $group: {
-        _id: '$cartItems.name',
-        totalQuantity: { $sum: '$cartItems.quantity' }
-      }
-    }
-  ]).toArray();
-
-  const products = await productsCollection.find({}).toArray();
+  // Process product quantities
   const productQuantities = {};
   products.forEach(product => {
     productQuantities[product.name] = 0;
@@ -161,18 +170,13 @@ export async function getServerSideProps() {
     productQuantities[item._id] = item.totalQuantity;
   });
 
-  const totalPaymentResult = await billsCollection.aggregate([
-    {
-      $group: {
-        _id: null,
-        totalPayment: { $sum: '$totalPayment' }
-      }
-    }
-  ]).toArray();
+  // Extract total payment
   const totalPayment = totalPaymentResult.length > 0 ? totalPaymentResult[0].totalPayment : 0;
 
+  // Count total orders
   const totalOrders = await billsCollection.countDocuments();
 
+  // Close MongoDB connection
   client.close();
 
   return {

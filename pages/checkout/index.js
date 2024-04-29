@@ -168,7 +168,7 @@ export default function Checkout({ cartItems }) {
 }
 
 export async function getServerSideProps() {
-  const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
+  const client = await MongoClient.connect(process.env.MONGODB_URI);
   const db = client.db('leafy');
 
   const cartsCollection = db.collection('carts');

@@ -94,7 +94,7 @@ export async function getServerSideProps(context) {
   const { id } = context.params;
 
   // Connect to MongoDB
-  const client = await MongoClient.connect('mongodb+srv://admin:0123456@leafyapp.b78yiqq.mongodb.net/');
+  const client = await MongoClient.connect(process.env.MONGODB_URI);
   const db = client.db('leafy');
 
   // Get data from MongoDB
