@@ -121,15 +121,18 @@ export async function getServerSideProps() {
         }
       },
       {
-        $sort: { _id: 1 } // Sort by date in ascending order
+        $sort: { _id: -1 } // Sort by date in descending order
       },
       {
-        $limit: 7 // Limit the result to 7 documents (7 days)
+        $limit: 7 // Limit the result to the latest 7 documents (7 days)
       }
     ]).toArray();
 
+    // Reverse the array to display the latest data first
+    dailySalesResult.reverse();
+
     return dailySalesResult;
-  }  
+  }
 
   // Fetch other data for the dashboard
   const [productQuantityResult, products, totalPaymentResult] = await Promise.all([
