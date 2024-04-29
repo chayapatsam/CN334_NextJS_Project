@@ -127,7 +127,7 @@ export default function Checkout({ cartItems }) {
           {/* Payment Method */}
           <div className="mt-4">
             <h2 className="text-2xl font-semibold">Payment Method</h2>
-            <button onClick={() => handleCashOnDelivery()} className="bg-[#2E5F2A]   text-white px-4 py-2 rounded mt-4">Cash on Delivery</button>
+            <button onClick={() => handleCashOnDelivery()} className="bg-gray-400 hover:bg-[#2E5F2A] active:bg-[#2E5F2A] text-white px-4 py-2 rounded mt-4">Cash on Delivery</button>
           </div>
 
           <div className="mt-4 border-t border-gray-800 pt-4 flex justify-between">
