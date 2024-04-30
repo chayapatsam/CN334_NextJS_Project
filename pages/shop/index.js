@@ -33,7 +33,7 @@ export async function getServerSideProps() {
   const cartsCollection = db.collection("products");
   const products = await cartsCollection.find({}).toArray();
 
-  client.close();อ
+  client.close();
 
   return {
     props: {
